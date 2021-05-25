@@ -2,7 +2,9 @@
 
 return [
     'ENDPOINTS' => [
-        'NEW_PROSPECT' => '/api/v1/new_prospect',
+        'STICKY' => [
+            'NEW_PROSPECT' => '/api/v1/new_prospect',
+        ],
     ],
 
     'NEW_PROSPECT_VALIDATION' => [

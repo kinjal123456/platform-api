@@ -5,9 +5,13 @@ namespace App\Classes\StickyTraits;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
 
+/**
+ * Trait StickyTraits
+ */
 trait StickyTraits
 {
-    /**
+    /** Prepare Http request with basic auth and header
+     *
      * @return PendingRequest
      */
     private function getRequest(): PendingRequest
@@ -18,6 +22,11 @@ trait StickyTraits
         return Http::withBasicAuth($username, $password)->withHeaders(['Content-Type' => 'application/json']);
     }
 
+    /** Prepare payload for the new_prospect API
+     *
+     * @param array $data
+     * @return array
+     */
     private function newProspectPayload(array $data): array
     {
         return [

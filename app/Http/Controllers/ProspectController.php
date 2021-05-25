@@ -6,19 +6,27 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
 use App\Classes\StickyApi\Prospects\Prospects;
+use Exception;
 
+/**
+ * Class ProspectController
+ */
 class ProspectController extends Controller
 {
-    /** call sticky new prospect api
+    /** Call sticky new prospect api
      *
      * @param Request $request
      * @return JsonResponse
      */
-    public function newProspect(Request $request): JsonResponse
+    public function create(Request $request): JsonResponse
     {
-        $stickyPayload = $request->all();
-        $prospect      = new Prospects();
+        try {
+            $stickyPayload = $request->all();
+            $prospect      = new Prospects();
 
-        return $prospect->newProspect($stickyPayload);
+            return $prospect->newProspect($stickyPayload);
+        } catch (Exception $ex) {
+            return response()->json([$ex->getMessage()]);
+        }
     }
 }

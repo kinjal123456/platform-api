@@ -14,8 +14,10 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
+/*Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
-});
+});*/
 
-Route::post('/new_prospect', 'ProspectController@newProspect')->name('new_prospect');
+Route::group(['prefix' => 'prospect'], function() {
+    Route::post('/create', 'ProspectController@create');
+});

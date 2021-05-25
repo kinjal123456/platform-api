@@ -17,7 +17,7 @@ class Prospects
     use StickyTraits;
 
     /** Create new prospect - Sticky.io
-     *
+     * @link https://developer-prod.sticky.io/#0c888f79-8ff8-435f-b5e9-f6b0f6357123
      * @param array $data
      * @return JsonResponse
      */
@@ -35,7 +35,7 @@ class Prospects
 
             //If validation pass, call new prospect api
             $stickyHost    = env('STICKY_API_DOMAIN');
-            $endPoint      = Config::get('sticky.ENDPOINTS.NEW_PROSPECT');
+            $endPoint      = Config::get('sticky.STICKY.ENDPOINTS.NEW_PROSPECT');
             $host          = $stickyHost.$endPoint;
             $request       = $this->getRequest();
             $stickyPayload = $this->newProspectPayload($data);
