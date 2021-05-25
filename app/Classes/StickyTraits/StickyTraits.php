@@ -3,6 +3,7 @@
 namespace App\Classes\StickyTraits;
 
 use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
 
 /**
@@ -22,36 +23,39 @@ trait StickyTraits
         return Http::withBasicAuth($username, $password)->withHeaders(['Content-Type' => 'application/json']);
     }
 
-    /** Prepare payload for the new_prospect API
-     *
-     * @param array $data
-     * @return array
+    /** Check for the each update prospect api field response
+     * @param array $response
+     * @return bool
      */
-    private function newProspectPayload(array $data): array
+    private function checkEachFieldFromApiResponse(array $response): bool
     {
-        return [
-            'campaignId' => $data['campaignId'],
-            'email'      => $data['email'],
-            'ipAddress'  => $data['ipAddress'],
-            'firstName'  => (! empty($data['firstName'])) ? $data['firstName'] : '',
-            'lastName'   => (! empty($data['lastName'])) ? $data['lastName'] : '',
-            'address1'   => (! empty($data['address1'])) ? $data['address1'] : '',
-            'address2'   => (! empty($data['address2'])) ? $data['address2'] : '',
-            'city'       => (! empty($data['city'])) ? $data['city'] : '',
-            'state'      => (! empty($data['state'])) ? $data['state'] : '',
-            'zip'        => (! empty($data['zip'])) ? $data['zip'] : '',
-            'country'    => (! empty($data['country'])) ? $data['country'] : '',
-            'phone'      => (! empty($data['phone'])) ? $data['phone'] : '',
-            'AFID'       => (! empty($data['AFID'])) ? $data['AFID'] : '',
-            'SID'        => (! empty($data['SID'])) ? $data['SID'] : '',
-            'AFFID'      => (! empty($data['AFFID'])) ? $data['AFFID'] : '',
-            'C1'         => (! empty($data['C1'])) ? $data['C1'] : '',
-            'C2'         => (! empty($data['C2'])) ? $data['C2'] : '',
-            'C3'         => (! empty($data['C3'])) ? $data['C3'] : '',
-            'AID'        => (! empty($data['AID'])) ? $data['AID'] : '',
-            'OPT'        => (! empty($data['OPT'])) ? $data['OPT'] : '',
-            'click_id'   => (! empty($data['click_id'])) ? $data['click_id'] : '',
-            'notes'      => (! empty($data['notes'])) ? $data['notes'] : '',
-        ];
+        $fieldResponse = false;
+        foreach (Arr::get($response, 'prospect_id', []) as $prospectResponse) {
+            if ((Arr::get($prospectResponse, 'first_name.response_code') !== '100' &&
+                    Arr::get($prospectResponse, 'first_name.response_code') !== '343') ||
+                (Arr::get($prospectResponse, 'last_name.response_code') !== '100' &&
+                    Arr::get($prospectResponse, 'last_name.response_code') !== '343') ||
+                (Arr::get($prospectResponse, 'address.response_code') !== '100' &&
+                    Arr::get($prospectResponse, 'address.response_code') !== '343') ||
+                (Arr::get($prospectResponse, 'address2.response_code') !== '100' &&
+                    Arr::get($prospectResponse, 'address2.response_code') !== '343') ||
+                (Arr::get($prospectResponse, 'city.response_code') !== '100' &&
+                    Arr::get($prospectResponse, 'city.response_code') !== '343') ||
+                (Arr::get($prospectResponse, 'state.response_code') !== '100' &&
+                    Arr::get($prospectResponse, 'state.response_code') !== '343') ||
+                (Arr::get($prospectResponse, 'zip.response_code') !== '100' &&
+                    Arr::get($prospectResponse, 'zip.response_code') !== '343') ||
+                (Arr::get($prospectResponse, 'country.response_code') !== '100' &&
+                    Arr::get($prospectResponse, 'country.response_code') !== '343') ||
+                (Arr::get($prospectResponse, 'phone.response_code') !== '100' &&
+                    Arr::get($prospectResponse, 'phone.response_code') !== '343') ||
+                (Arr::get($prospectResponse, 'email.response_code') !== '100' &&
+                    Arr::get($prospectResponse, 'email.response_code') !== '343') ||
+                (Arr::get($prospectResponse, 'notes.response_code') !== '100' &&
+                    Arr::get($prospectResponse, 'notes.response_code') !== '343')) {
+                $fieldResponse = true;
+            }
+        }
+        return $fieldResponse;
     }
 }

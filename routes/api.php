@@ -20,4 +20,13 @@ use Illuminate\Support\Facades\Route;
 
 Route::group(['prefix' => 'prospect'], function() {
     Route::post('/create', 'ProspectController@create');
+    Route::post('/update', 'ProspectController@update');
+});
+
+Route::group(['prefix' => 'order'], function() {
+    Route::post('/create', 'OrderController@create');
+});
+
+Route::group(['prefix' => 'upsell'], function() {
+    Route::post('/create', 'UpsellController@create');
 });

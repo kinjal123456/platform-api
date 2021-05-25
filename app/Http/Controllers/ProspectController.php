@@ -29,4 +29,21 @@ class ProspectController extends Controller
             return response()->json([$ex->getMessage()]);
         }
     }
+
+    /** Call sticky update prospect api
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function update(Request $request): JsonResponse
+    {
+        try {
+            $stickyPayload = $request->all();
+            $prospect      = new Prospects();
+
+            return $prospect->updateProspect($stickyPayload);
+        } catch (Exception $ex) {
+            return response()->json([$ex->getMessage()]);
+        }
+    }
 }
