@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
 use App\Classes\StickyApi\Prospects\Prospects;
@@ -10,13 +11,14 @@ class ProspectController extends Controller
 {
     /** call sticky new prospect api
      *
-     * @return array
+     * @param Request $request
+     * @return JsonResponse
      */
-    public function newProspect(Request $request): array
+    public function newProspect(Request $request): JsonResponse
     {
         $stickyPayload = $request->all();
         $prospect      = new Prospects();
 
-        $prospect->newProspect($stickyPayload);
+        return $prospect->newProspect($stickyPayload);
     }
 }

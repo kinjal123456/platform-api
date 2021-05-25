@@ -2,42 +2,61 @@
 
 namespace App\Classes\StickyApi\Prospects;
 
-use Illuminate\Contracts\Validation\Validator;
-use Illuminate\Support\Facades\Http;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Http\Client\PendingRequest;
+use Exception;
+use InvalidArgumentException;
+use App\Classes\StickyTraits\StickyTraits;
 
 /**
  * Class Prospects
  */
 class Prospects
 {
-    /** Create new prospect
+    use StickyTraits;
+
+    /** Create new prospect - Sticky.io
      *
-     * @return array|mixed
+     * @param array $data
+     * @return JsonResponse
      */
-    public function newProspect(array $request): array
+    public function newProspect(array $data): JsonResponse
     {
-        //all the api validations
-        $validated = Validator::make($request, Config::get('sticky.NEW_PROSPECT_VALIDATION'));
-dd($validated);
-        //on success call new prospect api
-        $stickyHost = Config::get('sticky.STICKY_CREDENTIALS.STICKY_API_DOMAIN');
-        $endPoint   = Config::get('sticky.ENDPOINTS.NEW_PROSPECT');
-        $host       = $stickyHost.$endPoint;
-        $request    = $this->getRequest();
+        $returnResponse = ['error' => true, 'message' => '', 'data' => []];
+        try {
+            //Api validations
+            $isValid = json_decode(validator($data, Config::get('sticky.NEW_PROSPECT_VALIDATION'))->errors(), true);
 
-        return $request->post($host, $stickybody)->json();
-    }
+            if ($isValid) {
+                $returnResponse['data'] = $isValid;
+                throw new InvalidArgumentException(__('sticky.new_prospect_validation_fails'));
+            }
 
-    /**
-     * @return PendingRequest
-     */
-    private function getRequest(): PendingRequest
-    {
-        $username = Config::get('sticky.STICKY_CREDENTIALS.STICKY_API_USERNAME');
-        $password = Config::get('sticky.STICKY_CREDENTIALS.STICKY_API_PASSWORD');
+            //If validation pass, call new prospect api
+            $stickyHost    = env('STICKY_API_DOMAIN');
+            $endPoint      = Config::get('sticky.ENDPOINTS.NEW_PROSPECT');
+            $host          = $stickyHost.$endPoint;
+            $request       = $this->getRequest();
+            $stickyPayload = $this->newProspectPayload($data);
 
-        return Http::withBasicAuth($username, $password)->withHeaders(['Content-Type' => 'application/json']);
+            $response = $request->post($host, $stickyPayload)->json();
+
+            //If Api request decline
+            if (Arr::get($response, 'response_code') !== '100' && Arr::get($response, 'error_found') === '1') {
+                throw new InvalidArgumentException(Arr::get($response, 'decline_reason'));
+            }
+
+            $returnResponse['error']   = false;
+            $returnResponse['message'] = __('sticky.new_prospect_create_success');
+            $returnResponse['data']    = json_encode($response);
+
+            return response()->json($returnResponse);
+        } catch (Exception $ex) {
+            //@ToDo log Exception
+            $returnResponse['message'] = $ex->getMessage();
+
+            return response()->json($returnResponse);
+        }
     }
 }
