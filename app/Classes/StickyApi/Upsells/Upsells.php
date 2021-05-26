@@ -27,12 +27,7 @@ class Upsells
         $returnResponse = ['error' => true, 'message' => '', 'data' => []];
         try {
             //Api validations
-            $isValid = json_decode(validator($upsellPayload, Config::get('sticky.NEW_UPSELL_VALIDATION'))->errors(), true);
 
-            if ($isValid) {
-                $returnResponse['data'] = $isValid;
-                throw new InvalidArgumentException(__('sticky.new_upsell_validation_fails'));
-            }
 
             //If validation pass, call new prospect api
             $stickyHost    = env('STICKY_API_DOMAIN');
@@ -44,7 +39,7 @@ class Upsells
 
             //If Api request decline
             if (Arr::get($response, 'response_code') !== '100' && Arr::get($response, 'error_found') === '1') {
-                throw new InvalidArgumentException(Arr::get($response, 'decline_reason'));
+                throw new InvalidArgumentException(Arr::get($response, 'error_message'));
             }
 
             $returnResponse['error']   = false;

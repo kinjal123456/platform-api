@@ -73,8 +73,6 @@ return [
     'NEW_UPSELL_VALIDATION' => [
         'previousOrderId' => 'required',
         'shippingId'      => 'required',
-        'ipAddress'       => 'required',
-        'campaignId'      => 'required',
         'offers'          => 'required',
     ],
 ];
