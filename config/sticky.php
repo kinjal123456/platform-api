@@ -6,6 +6,7 @@ return [
             'NEW_PROSPECT'    => '/api/v1/new_prospect',
             'UPDATE_PROSPECT' => '/api/v1/prospect_update',
             'NEW_ORDER'       => '/api/v1/new_order',
+            'UPDATE_ORDER'    => '/api/v1/order_update',
             'NEW_UPSELL'      => '/api/v1/new_upsell',
         ],
     ],
@@ -45,7 +46,7 @@ return [
         'zip'        => 'numeric',
         'country'    => 'string',
         'phone'      => 'numeric',
-        'email'      => 'required|email',
+        'email'      => 'email',
         'notes'      => 'string',
     ],
 
@@ -68,6 +69,13 @@ return [
         'ipAddress'        => 'required',
         'campaignId'       => 'required',
         'offers'           => 'required',
+    ],
+
+    'UPDATE_ORDER_VALIDATION' => [
+        'notes'      => 'string',
+        'email'      => 'email',
+        'first_name' => 'string',
+        'last_name'  => 'string',
     ],
 
     'NEW_UPSELL_VALIDATION' => [

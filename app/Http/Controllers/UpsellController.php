@@ -22,7 +22,7 @@ class UpsellController extends Controller
     {
         try {
             $upsellPayload = $request->all();
-            $upsells = new Upsells();
+            $upsells       = new Upsells();
 
             return $upsells->newUpsell($upsellPayload);
         } catch (Exception $ex) {

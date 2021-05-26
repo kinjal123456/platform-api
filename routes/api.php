@@ -25,6 +25,7 @@ Route::group(['prefix' => 'prospect'], function() {
 
 Route::group(['prefix' => 'order'], function() {
     Route::post('/create', 'OrderController@create');
+    Route::post('/update', 'OrderController@update');
 });
 
 Route::group(['prefix' => 'upsell'], function() {

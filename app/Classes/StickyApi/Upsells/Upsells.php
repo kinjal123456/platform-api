@@ -34,11 +34,11 @@ class Upsells
                 throw new InvalidArgumentException(__('sticky.new_upsell_validation_fails'));
             }
 
-            //If validation pass, call new prospect api
-            $stickyHost    = env('STICKY_API_DOMAIN');
-            $endPoint      = Config::get('sticky.ENDPOINTS.STICKY.NEW_UPSELL');
-            $host          = $stickyHost.$endPoint;
-            $request       = $this->getRequest();
+            //If validation pass, call new upsell api
+            $stickyHost = env('STICKY_API_DOMAIN');
+            $endPoint   = Config::get('sticky.ENDPOINTS.STICKY.NEW_UPSELL');
+            $host       = $stickyHost.$endPoint;
+            $request    = $this->getRequest();
 
             $response = $request->post($host, $upsellPayload)->json();
 
@@ -52,7 +52,7 @@ class Upsells
             $returnResponse['data']    = json_encode($response);
 
             return response()->json($returnResponse);
-        } catch(Exception $ex) {
+        } catch (Exception $ex) {
             //@ToDo log Exception
             $returnResponse['message'] = $ex->getMessage();
 

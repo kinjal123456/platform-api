@@ -19,7 +19,7 @@ class Prospects
     /** Create new prospect - Sticky.io
      *
      * @link https://developer-prod.sticky.io/#0c888f79-8ff8-435f-b5e9-f6b0f6357123
-     * @param array $data
+     * @param array $prospectPayload
      * @return JsonResponse
      */
     public function newProspect(array $prospectPayload): JsonResponse
@@ -35,10 +35,10 @@ class Prospects
             }
 
             //If validation pass, call new prospect api
-            $stickyHost    = env('STICKY_API_DOMAIN');
-            $endPoint      = Config::get('sticky.ENDPOINTS.STICKY.NEW_PROSPECT');
-            $host          = $stickyHost.$endPoint;
-            $request       = $this->getRequest();
+            $stickyHost = env('STICKY_API_DOMAIN');
+            $endPoint   = Config::get('sticky.ENDPOINTS.STICKY.NEW_PROSPECT');
+            $host       = $stickyHost.$endPoint;
+            $request    = $this->getRequest();
 
             $response = $request->post($host, $prospectPayload)->json();
 
@@ -60,7 +60,7 @@ class Prospects
         }
     }
 
-    /** Update new prospect - Sticky.io
+    /** Update prospect - Sticky.io
      *
      * @link https://developer-prod.sticky.io/#c1e65f32-eb37-48e5-904a-bc4ed02134cf
      * @param array $prospectPayload
@@ -89,16 +89,11 @@ class Prospects
 
             $response = $request->post($host, $prospectPayload)->json();
 
-            //Check each field response from the update_prospect API
-            $fieldResponse = $this->checkEachFieldFromApiResponse($response);
-
-            if ($fieldResponse === true) {
-                $returnResponse['data'] = json_encode($response);
-                throw new InvalidArgumentException(__('update_prospect_response_fails'));
-            }
+            //Write update_prospect API response (field specific) in a log
+            //@ToDo log
 
             $returnResponse['error']   = false;
-            $returnResponse['message'] = __('sticky.update_prospect_create_success');
+            $returnResponse['message'] = __('sticky.update_prospect_success');
             $returnResponse['data']    = json_encode($response);
 
             return response()->json($returnResponse);

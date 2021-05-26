@@ -22,9 +22,26 @@ class OrderController extends Controller
     {
         try {
             $orderPayload = $request->all();
-            $orders = new Orders();
+            $orders       = new Orders();
 
             return $orders->newOrder($orderPayload);
+        } catch (Exception $ex) {
+            return response()->json([$ex->getMessage()]);
+        }
+    }
+
+    /** Call sticky update order api
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function update(Request $request): JsonResponse
+    {
+        try {
+            $orderPayload = $request->all();
+            $orders       = new Orders();
+
+            return $orders->updateOrder($orderPayload);
         } catch (Exception $ex) {
             return response()->json([$ex->getMessage()]);
         }

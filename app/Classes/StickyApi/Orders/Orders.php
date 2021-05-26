@@ -26,9 +26,15 @@ class Orders
     {
         $returnResponse = ['error' => true, 'message' => '', 'data' => []];
         try {
+            $orderPayload['shippingAddress1'] = str_replace(',', '', $orderPayload['shippingAddress1']);
+            $orderPayload['shippingAddress2'] = str_replace(',', '', $orderPayload['shippingAddress2']);
+            
             //Api validations
             $orderFieldsToValidate = Config::get('sticky.NEW_ORDER_VALIDATION');
             if (! empty(Arr::get($orderPayload, 'billingSameAsShipping')) && strtoupper(Arr::get($orderPayload, 'billingSameAsShipping')) === 'NO') {
+                $orderPayload['billingAddress1'] = str_replace(',', '', $orderPayload['billingAddress1']);
+                $orderPayload['billingAddress2'] = str_replace(',', '', $orderPayload['billingAddress2']);
+
                 $orderFieldsToValidate['billingAddress1'] = 'required';
                 $orderFieldsToValidate['billingCity']     = 'required';
                 $orderFieldsToValidate['billingState']    = 'required';
@@ -58,6 +64,51 @@ class Orders
 
             $returnResponse['error']   = false;
             $returnResponse['message'] = __('sticky.new_order_create_success');
+            $returnResponse['data']    = json_encode($response);
+
+            return response()->json($returnResponse);
+        } catch (Exception $ex) {
+            //@ToDo log Exception
+            $returnResponse['message'] = $ex->getMessage();
+
+            return response()->json($returnResponse);
+        }
+    }
+
+    /** Update order - Sticky.io
+     *
+     * @link https://developer-prod.sticky.io/#50bf0f66-38b2-4513-908d-04f4af02593f
+     * @param array $orderPayload
+     * @return JsonResponse
+     */
+    public function updateOrder(array $orderPayload): JsonResponse
+    {
+        $isValid        = [];
+        $returnResponse = ['error' => true, 'message' => '', 'data' => []];
+        try {
+            //Api validations
+            foreach (Arr::get($orderPayload, 'order_id', []) as $orderId => $orders) {
+                $isValid[$orderId] = json_decode(validator($orders, Config::get('sticky.UPDATE_ORDER_VALIDATION'))->errors(), true);
+
+                if ($isValid[$orderId]) {
+                    $returnResponse['data'] = $isValid;
+                    throw new InvalidArgumentException(__('sticky.new_order_validation_fails'));
+                }
+            }
+
+            //If validation pass, call update order api
+            $stickyHost = env('STICKY_API_DOMAIN');
+            $endPoint   = Config::get('sticky.ENDPOINTS.STICKY.UPDATE_ORDER');
+            $host       = $stickyHost.$endPoint;
+            $request    = $this->getRequest();
+
+            $response = $request->post($host, $orderPayload)->json();
+
+            //Write order_update API response (field specific) in a log
+            //@ToDo log
+
+            $returnResponse['error']   = false;
+            $returnResponse['message'] = __('sticky.update_order_success');
             $returnResponse['data']    = json_encode($response);
 
             return response()->json($returnResponse);
