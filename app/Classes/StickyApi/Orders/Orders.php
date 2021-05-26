@@ -27,7 +27,16 @@ class Orders
         $returnResponse = ['error' => true, 'message' => '', 'data' => []];
         try {
             //Api validations
-            $isValid = json_decode(validator($orderPayload, Config::get('sticky.NEW_ORDER_VALIDATION'))->errors(), true);
+            $orderFieldsToValidate = Config::get('sticky.NEW_ORDER_VALIDATION');
+            if (! empty(Arr::get($orderPayload, 'billingSameAsShipping')) && strtoupper(Arr::get($orderPayload, 'billingSameAsShipping')) === 'NO') {
+                $orderFieldsToValidate['billingAddress1'] = 'required';
+                $orderFieldsToValidate['billingCity']     = 'required';
+                $orderFieldsToValidate['billingState']    = 'required';
+                $orderFieldsToValidate['billingZip']      = 'required';
+                $orderFieldsToValidate['billingCountry']  = 'required';
+            }
+
+            $isValid = json_decode(validator($orderPayload, $orderFieldsToValidate)->errors(), true);
 
             if ($isValid) {
                 $returnResponse['data'] = $isValid;
@@ -35,10 +44,10 @@ class Orders
             }
 
             //If validation pass, call new order api
-            $stickyHost    = env('STICKY_API_DOMAIN');
-            $endPoint      = Config::get('sticky.ENDPOINTS.STICKY.NEW_ORDER');
-            $host          = $stickyHost.$endPoint;
-            $request       = $this->getRequest();
+            $stickyHost = env('STICKY_API_DOMAIN');
+            $endPoint   = Config::get('sticky.ENDPOINTS.STICKY.NEW_ORDER');
+            $host       = $stickyHost.$endPoint;
+            $request    = $this->getRequest();
 
             $response = $request->post($host, $orderPayload)->json();
 
@@ -50,6 +59,7 @@ class Orders
             $returnResponse['error']   = false;
             $returnResponse['message'] = __('sticky.new_order_create_success');
             $returnResponse['data']    = json_encode($response);
+
             return response()->json($returnResponse);
         } catch (Exception $ex) {
             //@ToDo log Exception
