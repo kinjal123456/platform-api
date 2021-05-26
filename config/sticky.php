@@ -52,6 +52,11 @@ return [
     'NEW_ORDER_VALIDATION' => [
         'firstName'        => 'required',
         'lastName'         => 'required',
+        'shippingAddress1' => 'required',
+        'shippingCity'     => 'required',
+        'shippingState'    => 'required',
+        'shippingZip'      => 'required',
+        'shippingCountry'  => 'required',
         'billingFirstName' => 'required',
         'billingLastName'  => 'required',
         'billingAddress1'  => 'required',

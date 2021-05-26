@@ -44,7 +44,7 @@ class Orders
 
             //If Api request decline
             if (Arr::get($response, 'response_code') !== '100' && Arr::get($response, 'error_found') === '1') {
-                throw new InvalidArgumentException(Arr::get($response, 'decline_reason'));
+                throw new InvalidArgumentException(Arr::get($response, 'error_message'));
             }
 
             $returnResponse['error']   = false;
