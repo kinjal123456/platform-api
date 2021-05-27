@@ -20,12 +20,14 @@ return [
     | Sticky API Lines
     |--------------------------------------------------------------------------
     |
-    | The following language lines contain the Sticky.io new_order | order_update
+    | The following language lines contain the Sticky.io Order
     | API messages
     */
-    'new_order_validation_fails'    => 'Invalid order payload.',
+    'order_validation_fails'        => 'Invalid order payload.',
     'new_order_create_success'      => 'Order created successfully.',
     'update_order_success'          => 'Order updated successfully.',
+    'view_order_fails'              => 'Something went wrong while fetching order details for the following Order Id(s) %s.',
+    'view_order_success'            => 'Order details fetched successfully.',
 
     /*
     |--------------------------------------------------------------------------

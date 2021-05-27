@@ -7,6 +7,7 @@ return [
             'UPDATE_PROSPECT'      => '/api/v1/prospect_update',
             'NEW_ORDER'            => '/api/v1/new_order',
             'UPDATE_ORDER'         => '/api/v1/order_update',
+            'VIEW_ORDER'           => '/api/v1/order_view',
             'NEW_UPSELL'           => '/api/v1/new_upsell',
             'GET_SHIPPING_METHODS' => '/api/v2/shipping',
         ],
@@ -77,6 +78,10 @@ return [
         'email'      => 'email',
         'first_name' => 'string',
         'last_name'  => 'string',
+    ],
+
+    'VIEW_ORDER_VALIDATION' => [
+        'order_id' => 'required|array',
     ],
 
     'NEW_UPSELL_VALIDATION' => [

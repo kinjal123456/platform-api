@@ -46,7 +46,7 @@ class Orders
 
             if ($isValid) {
                 $returnResponse['data'] = $isValid;
-                throw new InvalidArgumentException(__('sticky.new_order_validation_fails'));
+                throw new InvalidArgumentException(__('sticky.order_validation_fails'));
             }
 
             //If validation pass, call new order api
@@ -92,7 +92,7 @@ class Orders
 
                 if ($isValid[$orderId]) {
                     $returnResponse['data'] = $isValid;
-                    throw new InvalidArgumentException(__('sticky.new_order_validation_fails'));
+                    throw new InvalidArgumentException(__('sticky.order_validation_fails'));
                 }
             }
 
@@ -109,6 +109,50 @@ class Orders
 
             $returnResponse['error']   = false;
             $returnResponse['message'] = __('sticky.update_order_success');
+            $returnResponse['data']    = $response;
+
+            return response()->json($returnResponse);
+        } catch (Exception $ex) {
+            //@ToDo log Exception
+            $returnResponse['message'] = $ex->getMessage();
+
+            return response()->json($returnResponse);
+        }
+    }
+
+    /** View orders - Sticky.io
+     *
+     * @link https://developer-prod.sticky.io/#fa3f4efb-0b1f-4467-9454-3bb1aff96aae
+     * @param array $orderPayload
+     * @return JsonResponse
+     */
+    public function viewOrder(array $orderPayload): JsonResponse
+    {
+        $returnResponse = ['error' => true, 'message' => '', 'data' => []];
+        try {
+            //Api validations
+            $isValid = json_decode(validator($orderPayload, Config::get('sticky.VIEW_ORDER_VALIDATION'))->errors(), true);
+
+            if ($isValid) {
+                $returnResponse['data'] = $isValid;
+                throw new InvalidArgumentException(__('sticky.order_validation_fails'));
+            }
+
+            //If validation pass, call view order api
+            $stickyHost = env('STICKY_API_DOMAIN');
+            $endPoint   = Config::get('sticky.ENDPOINTS.STICKY.VIEW_ORDER');
+            $host       = $stickyHost.$endPoint;
+            $request    = $this->getRequest();
+
+            $response = $request->post($host, $orderPayload)->json();
+
+            //If Api request decline
+            if (Arr::get($response, 'response_code') !== '100') {
+                throw new InvalidArgumentException(sprintf(__('sticky.view_order_fails'), implode(',', Arr::get($orderPayload, 'order_id'))));
+            }
+
+            $returnResponse['error']   = false;
+            $returnResponse['message'] = __('sticky.view_order_success');
             $returnResponse['data']    = $response;
 
             return response()->json($returnResponse);

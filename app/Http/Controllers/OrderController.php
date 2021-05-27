@@ -46,4 +46,20 @@ class OrderController extends Controller
             return response()->json([$ex->getMessage()]);
         }
     }
+
+    /** Call sticky order view api
+     *
+     * @return JsonResponse
+     */
+    public function view(Request $request): JsonResponse
+    {
+        try {
+            $orderPayload = $request->all();
+            $orders = new Orders();
+
+            return $orders->viewOrder($orderPayload);
+        } catch (Exception $ex) {
+            return response()->json([$ex->getMessage()]);
+        }
+    }
 }
