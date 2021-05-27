@@ -31,3 +31,7 @@ Route::group(['prefix' => 'order'], function() {
 Route::group(['prefix' => 'upsell'], function() {
     Route::post('/create', 'UpsellController@create');
 });
+
+Route::group(['prefix' => 'shipping'], function() {
+    Route::get('/get', 'ShippingController@get');
+});

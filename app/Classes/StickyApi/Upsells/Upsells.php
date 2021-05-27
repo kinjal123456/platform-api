@@ -49,7 +49,7 @@ class Upsells
 
             $returnResponse['error']   = false;
             $returnResponse['message'] = __('sticky.new_upsell_create_success');
-            $returnResponse['data']    = json_encode($response);
+            $returnResponse['data']    = $response;
 
             return response()->json($returnResponse);
         } catch (Exception $ex) {

@@ -28,7 +28,7 @@ class Orders
         try {
             $orderPayload['shippingAddress1'] = str_replace(',', '', $orderPayload['shippingAddress1']);
             $orderPayload['shippingAddress2'] = str_replace(',', '', $orderPayload['shippingAddress2']);
-            
+
             //Api validations
             $orderFieldsToValidate = Config::get('sticky.NEW_ORDER_VALIDATION');
             if (! empty(Arr::get($orderPayload, 'billingSameAsShipping')) && strtoupper(Arr::get($orderPayload, 'billingSameAsShipping')) === 'NO') {
@@ -64,7 +64,7 @@ class Orders
 
             $returnResponse['error']   = false;
             $returnResponse['message'] = __('sticky.new_order_create_success');
-            $returnResponse['data']    = json_encode($response);
+            $returnResponse['data']    = $response;
 
             return response()->json($returnResponse);
         } catch (Exception $ex) {
@@ -109,7 +109,7 @@ class Orders
 
             $returnResponse['error']   = false;
             $returnResponse['message'] = __('sticky.update_order_success');
-            $returnResponse['data']    = json_encode($response);
+            $returnResponse['data']    = $response;
 
             return response()->json($returnResponse);
         } catch (Exception $ex) {

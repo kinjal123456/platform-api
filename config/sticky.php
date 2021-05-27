@@ -3,11 +3,12 @@
 return [
     'ENDPOINTS' => [
         'STICKY' => [
-            'NEW_PROSPECT'    => '/api/v1/new_prospect',
-            'UPDATE_PROSPECT' => '/api/v1/prospect_update',
-            'NEW_ORDER'       => '/api/v1/new_order',
-            'UPDATE_ORDER'    => '/api/v1/order_update',
-            'NEW_UPSELL'      => '/api/v1/new_upsell',
+            'NEW_PROSPECT'         => '/api/v1/new_prospect',
+            'UPDATE_PROSPECT'      => '/api/v1/prospect_update',
+            'NEW_ORDER'            => '/api/v1/new_order',
+            'UPDATE_ORDER'         => '/api/v1/order_update',
+            'NEW_UPSELL'           => '/api/v1/new_upsell',
+            'GET_SHIPPING_METHODS' => '/api/v2/shipping',
         ],
     ],
 

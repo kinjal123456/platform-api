@@ -49,7 +49,7 @@ class Prospects
 
             $returnResponse['error']   = false;
             $returnResponse['message'] = __('sticky.new_prospect_create_success');
-            $returnResponse['data']    = json_encode($response);
+            $returnResponse['data']    = $response;
 
             return response()->json($returnResponse);
         } catch (Exception $ex) {
@@ -94,7 +94,7 @@ class Prospects
 
             $returnResponse['error']   = false;
             $returnResponse['message'] = __('sticky.update_prospect_success');
-            $returnResponse['data']    = json_encode($response);
+            $returnResponse['data']    = $response;
 
             return response()->json($returnResponse);
         } catch (Exception $ex) {
