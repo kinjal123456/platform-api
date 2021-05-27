@@ -14,6 +14,7 @@ use App\Classes\StickyTraits\StickyTraits;
 class Shipping
 {
     use StickyTraits;
+    
     /** Get shipping methods - Sticky.io
      *
      * @link https://developer-v2.sticky.io/#240bc49b-19ac-4286-98ea-9485c70677e3
