@@ -7,7 +7,7 @@ return [
     | Sticky API Lines
     |--------------------------------------------------------------------------
     |
-    | The following language lines contain the Sticky.io new_prospect API messages
+    | The following language lines contain the Sticky.io Prospect API messages
     |
     */
 
@@ -20,8 +20,8 @@ return [
     | Sticky API Lines
     |--------------------------------------------------------------------------
     |
-    | The following language lines contain the Sticky.io Order
-    | API messages
+    | The following language lines contain the Sticky.io Order API messages
+    |
     */
     'order_validation_fails'        => 'Invalid order payload.',
     'new_order_create_success'      => 'Order created successfully.',
@@ -34,7 +34,7 @@ return [
     | Sticky API Lines
     |--------------------------------------------------------------------------
     |
-    | The following language lines contain the Sticky.io new_upsell API messages
+    | The following language lines contain the Sticky.io Upsell API messages
     |
     */
     'new_upsell_validation_fails'   => 'Invalid upsell payload.',
@@ -45,7 +45,7 @@ return [
     | Sticky API Lines
     |--------------------------------------------------------------------------
     |
-    | The following language lines contain the Sticky.io "Get Shipping Methods" API messages
+    | The following language lines contain the Sticky.io Shipping API messages
     |
     */
     'get_shipping_methods_fails'    => 'Something went wrong while fetching the shipping methods.',
