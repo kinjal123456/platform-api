@@ -7,6 +7,17 @@ return [
     | Sticky API Lines
     |--------------------------------------------------------------------------
     |
+    | The following language lines contain the Sticky.io common messages
+    |
+    */
+
+    'invalid_payload' => 'Invalid payload.',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Sticky API Lines
+    |--------------------------------------------------------------------------
+    |
     | The following language lines contain the Sticky.io Prospect API messages
     |
     */

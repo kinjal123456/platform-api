@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Config;
 use Exception;
 use InvalidArgumentException;
 use App\Classes\StickyTraits\StickyTraits;
+use App\Classes\StickyTraits\ValidationTraits;
 
 /**
  * Class Orders
@@ -15,6 +16,7 @@ use App\Classes\StickyTraits\StickyTraits;
 class Orders
 {
     use StickyTraits;
+    use ValidationTraits;
 
     /** Create new order - Sticky.io
      *
@@ -24,12 +26,11 @@ class Orders
      */
     public function newOrder(array $orderPayload): JsonResponse
     {
-        $returnResponse = ['error' => true, 'message' => '', 'data' => []];
+        $returnResponse = ['error' => true, 'success' => true, 'message' => '', 'data' => []];
         try {
             $orderPayload['shippingAddress1'] = str_replace(',', '', $orderPayload['shippingAddress1']);
             $orderPayload['shippingAddress2'] = str_replace(',', '', $orderPayload['shippingAddress2']);
 
-            //Api validations
             $orderFieldsToValidate = Config::get('sticky.NEW_ORDER_VALIDATION');
             if (! empty(Arr::get($orderPayload, 'billingSameAsShipping')) && strtoupper(Arr::get($orderPayload, 'billingSameAsShipping')) === 'NO') {
                 $orderPayload['billingAddress1'] = str_replace(',', '', $orderPayload['billingAddress1']);
@@ -42,12 +43,8 @@ class Orders
                 $orderFieldsToValidate['billingCountry']  = 'required';
             }
 
-            $isValid = json_decode(validator($orderPayload, $orderFieldsToValidate)->errors(), true);
-
-            if ($isValid) {
-                $returnResponse['data'] = $isValid;
-                throw new InvalidArgumentException(__('sticky.order_validation_fails'));
-            }
+            //Api validations
+            $this->payloadValidation($orderPayload, $orderFieldsToValidate);
 
             //If validation pass, call new order api
             $stickyHost = env('STICKY_API_DOMAIN');
@@ -69,7 +66,11 @@ class Orders
             return response()->json($returnResponse);
         } catch (Exception $ex) {
             //@ToDo log Exception
+            $returnResponse['success'] = false;
             $returnResponse['message'] = $ex->getMessage();
+            if(! empty($this->validateResponse)) {
+                $returnResponse['data'] = $this->validateResponse;
+            }
 
             return response()->json($returnResponse);
         }
@@ -83,17 +84,11 @@ class Orders
      */
     public function updateOrder(array $orderPayload): JsonResponse
     {
-        $isValid        = [];
-        $returnResponse = ['error' => true, 'message' => '', 'data' => []];
+        $returnResponse = ['error' => true, 'success' => true, 'message' => '', 'data' => []];
         try {
             //Api validations
             foreach (Arr::get($orderPayload, 'order_id', []) as $orderId => $orders) {
-                $isValid[$orderId] = json_decode(validator($orders, Config::get('sticky.UPDATE_ORDER_VALIDATION'))->errors(), true);
-
-                if ($isValid[$orderId]) {
-                    $returnResponse['data'] = $isValid;
-                    throw new InvalidArgumentException(__('sticky.order_validation_fails'));
-                }
+                $this->payloadValidation($orders, Config::get('sticky.UPDATE_ORDER_VALIDATION'), $orderId);
             }
 
             //If validation pass, call update order api
@@ -114,7 +109,11 @@ class Orders
             return response()->json($returnResponse);
         } catch (Exception $ex) {
             //@ToDo log Exception
+            $returnResponse['success'] = false;
             $returnResponse['message'] = $ex->getMessage();
+            if(! empty($this->validateResponse)) {
+                $returnResponse['data'] = $this->validateResponse;
+            }
 
             return response()->json($returnResponse);
         }
@@ -128,15 +127,10 @@ class Orders
      */
     public function viewOrder(array $orderPayload): JsonResponse
     {
-        $returnResponse = ['error' => true, 'message' => '', 'data' => []];
+        $returnResponse = ['error' => true, 'success' => true, 'message' => '', 'data' => []];
         try {
             //Api validations
-            $isValid = json_decode(validator($orderPayload, Config::get('sticky.VIEW_ORDER_VALIDATION'))->errors(), true);
-
-            if ($isValid) {
-                $returnResponse['data'] = $isValid;
-                throw new InvalidArgumentException(__('sticky.order_validation_fails'));
-            }
+            $this->payloadValidation($orderPayload, Config::get('sticky.VIEW_ORDER_VALIDATION'));
 
             //If validation pass, call view order api
             $stickyHost = env('STICKY_API_DOMAIN');
@@ -158,7 +152,11 @@ class Orders
             return response()->json($returnResponse);
         } catch (Exception $ex) {
             //@ToDo log Exception
+            $returnResponse['success'] = false;
             $returnResponse['message'] = $ex->getMessage();
+            if(! empty($this->validateResponse)) {
+                $returnResponse['data'] = $this->validateResponse;
+            }
 
             return response()->json($returnResponse);
         }

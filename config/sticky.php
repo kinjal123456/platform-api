@@ -13,6 +13,13 @@ return [
         ],
     ],
 
+    'RESPONSE_CODES' => [
+        'STICKY' => [
+            '100' => 'Success',
+            '200' => 'Invalid login credentials'
+        ],
+    ],
+
     'NEW_PROSPECT_VALIDATION' => [
         'campaignId' => 'required|numeric',
         'email'      => 'required|email',
