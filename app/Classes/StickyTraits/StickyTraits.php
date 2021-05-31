@@ -3,7 +3,9 @@
 namespace App\Classes\StickyTraits;
 
 use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Http;
+use App\Classes\StickyApi\Config;
 
 /**
  * Trait StickyTraits
@@ -14,11 +16,24 @@ trait StickyTraits
      *
      * @return PendingRequest
      */
-    private function getRequest(): PendingRequest
+    private function setHttpRequest(): PendingRequest
     {
-        $username = env('STICKY_API_USERNAME');
-        $password = env('STICKY_API_PASSWORD');
+        return Http::withBasicAuth($this->username, $this->password)->withHeaders(['Content-Type' => 'application/json']);
+    }
 
-        return Http::withBasicAuth($username, $password)->withHeaders(['Content-Type' => 'application/json']);
+    /** Prepare Sticky API request
+     *
+     * @param string $endPoint
+     * @param string $method
+     * @param array $payload
+     * @return array
+     */
+
+    private function prepareRequest(string $endPoint, string $method, array $payload): array
+    {
+        $host    = $this->host.$endPoint;
+        $request = $this->setHttpRequest();
+
+        return $request->$method($host, $payload)->json();
     }
 }

@@ -16,8 +16,22 @@ return [
     'RESPONSE_CODES' => [
         'STICKY' => [
             '100' => 'Success',
-            '200' => 'Invalid login credentials'
+            '200' => 'Invalid login credentials',
         ],
+    ],
+
+    'METHODS' => [
+        'get'    => 'GET',
+        'post'   => 'POST',
+        'put'    => 'PUT',
+        'delete' => 'DELETE',
+    ],
+
+    'API_DEFAULT_RESPONSE' => [
+        'error'   => true,
+        'success' => true,
+        'message' => '',
+        'data'    => [],
     ],
 
     'NEW_PROSPECT_VALIDATION' => [

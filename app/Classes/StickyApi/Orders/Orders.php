@@ -9,6 +9,7 @@ use Exception;
 use InvalidArgumentException;
 use App\Classes\StickyTraits\StickyTraits;
 use App\Classes\StickyTraits\ValidationTraits;
+use App\Classes\StickyApi\ApiConfig;
 
 /**
  * Class Orders
@@ -18,6 +19,28 @@ class Orders
     use StickyTraits;
     use ValidationTraits;
 
+    private $host;
+
+    private $username;
+
+    private $password;
+
+    private $returnResponse;
+
+    public function __construct()
+    {
+        $host     = env('STICKY_API_DOMAIN');
+        $username = env('STICKY_API_USERNAME');
+        $password = env('STICKY_API_PASSWORD');
+
+        $apiConfig      = new ApiConfig();
+        $this->host     = $apiConfig->setHost($host);
+        $this->username = $apiConfig->setUsername($username);
+        $this->password = $apiConfig->setPassword($password);
+
+        $this->returnResponse = Config::get('sticky.API_DEFAULT_RESPONSE');
+    }
+
     /** Create new order - Sticky.io
      *
      * @link https://developer-prod.sticky.io/#0dddabee-997a-4b00-8f47-d560493cb1b7
@@ -26,7 +49,6 @@ class Orders
      */
     public function newOrder(array $orderPayload): JsonResponse
     {
-        $returnResponse = ['error' => true, 'success' => true, 'message' => '', 'data' => []];
         try {
             $orderPayload['shippingAddress1'] = str_replace(',', '', $orderPayload['shippingAddress1']);
             $orderPayload['shippingAddress2'] = str_replace(',', '', $orderPayload['shippingAddress2']);
@@ -47,32 +69,29 @@ class Orders
             $this->payloadValidation($orderPayload, $orderFieldsToValidate);
 
             //If validation pass, call new order api
-            $stickyHost = env('STICKY_API_DOMAIN');
-            $endPoint   = Config::get('sticky.ENDPOINTS.STICKY.NEW_ORDER');
-            $host       = $stickyHost.$endPoint;
-            $request    = $this->getRequest();
-
-            $response = $request->post($host, $orderPayload)->json();
+            $endPoint = Config::get('sticky.ENDPOINTS.STICKY.NEW_ORDER');
+            $method   = Config::get('sticky.METHODS.post');
+            $response = $this->prepareRequest($endPoint, $method, $orderPayload);
 
             //If Api request decline
             if (Arr::get($response, 'response_code') !== '100' && Arr::get($response, 'error_found') === '1') {
                 throw new InvalidArgumentException(Arr::get($response, 'error_message'));
             }
 
-            $returnResponse['error']   = false;
-            $returnResponse['message'] = __('sticky.new_order_create_success');
-            $returnResponse['data']    = $response;
+            $this->returnResponse['error']   = false;
+            $this->returnResponse['message'] = __('sticky.new_order_create_success');
+            $this->returnResponse['data']    = $response;
 
-            return response()->json($returnResponse);
+            return response()->json($this->returnResponse);
         } catch (Exception $ex) {
             //@ToDo log Exception
-            $returnResponse['success'] = false;
-            $returnResponse['message'] = $ex->getMessage();
-            if(! empty($this->validateResponse)) {
-                $returnResponse['data'] = $this->validateResponse;
+            $this->returnResponse['success'] = false;
+            $this->returnResponse['message'] = $ex->getMessage();
+            if (! empty($this->validateResponse)) {
+                $this->returnResponse['data'] = $this->validateResponse;
             }
 
-            return response()->json($returnResponse);
+            return response()->json($this->returnResponse);
         }
     }
 
@@ -84,7 +103,6 @@ class Orders
      */
     public function updateOrder(array $orderPayload): JsonResponse
     {
-        $returnResponse = ['error' => true, 'success' => true, 'message' => '', 'data' => []];
         try {
             //Api validations
             foreach (Arr::get($orderPayload, 'order_id', []) as $orderId => $orders) {
@@ -92,30 +110,27 @@ class Orders
             }
 
             //If validation pass, call update order api
-            $stickyHost = env('STICKY_API_DOMAIN');
-            $endPoint   = Config::get('sticky.ENDPOINTS.STICKY.UPDATE_ORDER');
-            $host       = $stickyHost.$endPoint;
-            $request    = $this->getRequest();
-
-            $response = $request->post($host, $orderPayload)->json();
+            $endPoint = Config::get('sticky.ENDPOINTS.STICKY.UPDATE_ORDER');
+            $method   = Config::get('sticky.METHODS.post');
+            $response = $this->prepareRequest($endPoint, $method, $orderPayload);
 
             //Write order_update API response (field specific) in a log
             //@ToDo log
 
-            $returnResponse['error']   = false;
-            $returnResponse['message'] = __('sticky.update_order_success');
-            $returnResponse['data']    = $response;
+            $this->returnResponse['error']   = false;
+            $this->returnResponse['message'] = __('sticky.update_order_success');
+            $this->returnResponse['data']    = $response;
 
-            return response()->json($returnResponse);
+            return response()->json($this->returnResponse);
         } catch (Exception $ex) {
             //@ToDo log Exception
-            $returnResponse['success'] = false;
-            $returnResponse['message'] = $ex->getMessage();
-            if(! empty($this->validateResponse)) {
-                $returnResponse['data'] = $this->validateResponse;
+            $this->returnResponse['success'] = false;
+            $this->returnResponse['message'] = $ex->getMessage();
+            if (! empty($this->validateResponse)) {
+                $this->returnResponse['data'] = $this->validateResponse;
             }
 
-            return response()->json($returnResponse);
+            return response()->json($this->returnResponse);
         }
     }
 
@@ -127,38 +142,34 @@ class Orders
      */
     public function viewOrder(array $orderPayload): JsonResponse
     {
-        $returnResponse = ['error' => true, 'success' => true, 'message' => '', 'data' => []];
         try {
             //Api validations
             $this->payloadValidation($orderPayload, Config::get('sticky.VIEW_ORDER_VALIDATION'));
 
             //If validation pass, call view order api
-            $stickyHost = env('STICKY_API_DOMAIN');
-            $endPoint   = Config::get('sticky.ENDPOINTS.STICKY.VIEW_ORDER');
-            $host       = $stickyHost.$endPoint;
-            $request    = $this->getRequest();
-
-            $response = $request->post($host, $orderPayload)->json();
+            $endPoint = Config::get('sticky.ENDPOINTS.STICKY.VIEW_ORDER');
+            $method   = Config::get('sticky.METHODS.post');
+            $response = $this->prepareRequest($endPoint, $method, $orderPayload);
 
             //If Api request decline
             if (Arr::get($response, 'response_code') !== '100') {
                 throw new InvalidArgumentException(sprintf(__('sticky.view_order_fails'), implode(',', Arr::get($orderPayload, 'order_id'))));
             }
 
-            $returnResponse['error']   = false;
-            $returnResponse['message'] = __('sticky.view_order_success');
-            $returnResponse['data']    = $response;
+            $this->returnResponse['error']   = false;
+            $this->returnResponse['message'] = __('sticky.view_order_success');
+            $this->returnResponse['data']    = $response;
 
-            return response()->json($returnResponse);
+            return response()->json($this->returnResponse);
         } catch (Exception $ex) {
             //@ToDo log Exception
-            $returnResponse['success'] = false;
-            $returnResponse['message'] = $ex->getMessage();
-            if(! empty($this->validateResponse)) {
-                $returnResponse['data'] = $this->validateResponse;
+            $this->returnResponse['success'] = false;
+            $this->returnResponse['message'] = $ex->getMessage();
+            if (! empty($this->validateResponse)) {
+                $this->returnResponse['data'] = $this->validateResponse;
             }
 
-            return response()->json($returnResponse);
+            return response()->json($this->returnResponse);
         }
     }
 }
