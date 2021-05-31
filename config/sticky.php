@@ -15,8 +15,8 @@ return [
 
     'RESPONSE_CODES' => [
         'STICKY' => [
-            '100' => 'Success',
-            '200' => 'Invalid login credentials',
+            '100',
+            '200',
         ],
     ],
 

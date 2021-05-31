@@ -74,7 +74,7 @@ class Orders
             $response = $this->prepareRequest($endPoint, $method, $orderPayload);
 
             //If Api request decline
-            if (Arr::get($response, 'response_code') !== '100' && Arr::get($response, 'error_found') === '1') {
+            if (Arr::get($response, 'response_code') !== Config::get('sticky.RESPONSE_CODES.STICKY.0') && Arr::get($response, 'error_found') === '1') {
                 throw new InvalidArgumentException(Arr::get($response, 'error_message'));
             }
 
@@ -152,7 +152,7 @@ class Orders
             $response = $this->prepareRequest($endPoint, $method, $orderPayload);
 
             //If Api request decline
-            if (Arr::get($response, 'response_code') !== '100') {
+            if (Arr::get($response, 'response_code') !== Config::get('sticky.RESPONSE_CODES.STICKY.0')) {
                 throw new InvalidArgumentException(sprintf(__('sticky.view_order_fails'), implode(',', Arr::get($orderPayload, 'order_id'))));
             }
 
