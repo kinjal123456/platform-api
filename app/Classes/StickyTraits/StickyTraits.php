@@ -29,7 +29,7 @@ trait StickyTraits
      * @return array
      */
 
-    private function prepareRequest(string $endPoint, string $method, array $payload): array
+    private function prepareRequest(string $endPoint, string $method, array $payload = []): array
     {
         $host    = $this->host.$endPoint;
         $request = $this->setHttpRequest();

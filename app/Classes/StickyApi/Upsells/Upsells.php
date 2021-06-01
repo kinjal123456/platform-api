@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Config;
 use Exception;
 use InvalidArgumentException;
 use App\Classes\StickyTraits\StickyTraits;
+use App\Classes\StickyTraits\ValidationTraits;
+use App\Classes\StickyApi\ApiConfig;
 
 /**
  * Class Upsells
@@ -15,6 +17,29 @@ use App\Classes\StickyTraits\StickyTraits;
 class Upsells
 {
     use StickyTraits;
+    use ValidationTraits;
+
+    private $host;
+
+    private $username;
+
+    private $password;
+
+    private $returnResponse;
+
+    public function __construct()
+    {
+        $host     = env('STICKY_API_DOMAIN');
+        $username = env('STICKY_API_USERNAME');
+        $password = env('STICKY_API_PASSWORD');
+
+        $apiConfig      = new ApiConfig();
+        $this->host     = $apiConfig->setHost($host);
+        $this->username = $apiConfig->setUsername($username);
+        $this->password = $apiConfig->setPassword($password);
+
+        $this->returnResponse = Config::get('sticky.API_DEFAULT_RESPONSE');
+    }
 
     /** Create new upsell - Sticky.io
      *
@@ -24,39 +49,34 @@ class Upsells
      */
     public function newUpsell(array $upsellPayload): JsonResponse
     {
-        $returnResponse = ['error' => true, 'message' => '', 'data' => []];
         try {
             //Api validations
-            $isValid = json_decode(validator($upsellPayload, Config::get('sticky.NEW_UPSELL_VALIDATION'))->errors(), true);
-
-            if ($isValid) {
-                $returnResponse['data'] = $isValid;
-                throw new InvalidArgumentException(__('sticky.new_upsell_validation_fails'));
-            }
+            $this->payloadValidation($upsellPayload, Config::get('sticky.NEW_UPSELL_VALIDATION'));
 
             //If validation pass, call new upsell api
-            $stickyHost = env('STICKY_API_DOMAIN');
             $endPoint   = Config::get('sticky.ENDPOINTS.STICKY.NEW_UPSELL');
-            $host       = $stickyHost.$endPoint;
-            $request    = $this->getRequest();
-
-            $response = $request->post($host, $upsellPayload)->json();
+            $method   = Config::get('sticky.METHODS.post');
+            $response = $this->prepareRequest($endPoint, $method, $upsellPayload);
 
             //If Api request decline
             if (Arr::get($response, 'response_code') !== '100' && Arr::get($response, 'error_found') === '1') {
                 throw new InvalidArgumentException(Arr::get($response, 'error_message'));
             }
 
-            $returnResponse['error']   = false;
-            $returnResponse['message'] = __('sticky.new_upsell_create_success');
-            $returnResponse['data']    = $response;
+            $this->returnResponse['error']   = false;
+            $this->returnResponse['message'] = __('sticky.new_upsell_create_success');
+            $this->returnResponse['data']    = $response;
 
-            return response()->json($returnResponse);
+            return response()->json($this->returnResponse);
         } catch (Exception $ex) {
             //@ToDo log Exception
-            $returnResponse['message'] = $ex->getMessage();
+            $this->returnResponse['success'] = false;
+            $this->returnResponse['message'] = $ex->getMessage();
+            if (! empty($this->validateResponse)) {
+                $this->returnResponse['data'] = $this->validateResponse;
+            }
 
-            return response()->json($returnResponse);
+            return response()->json($this->returnResponse);
         }
     }
 }

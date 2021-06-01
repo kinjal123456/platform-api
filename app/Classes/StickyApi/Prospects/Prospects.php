@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Config;
 use Exception;
 use InvalidArgumentException;
 use App\Classes\StickyTraits\StickyTraits;
+use App\Classes\StickyTraits\ValidationTraits;
+use App\Classes\StickyApi\ApiConfig;
 
 /**
  * Class Prospects
@@ -15,6 +17,29 @@ use App\Classes\StickyTraits\StickyTraits;
 class Prospects
 {
     use StickyTraits;
+    use ValidationTraits;
+
+    private $host;
+
+    private $username;
+
+    private $password;
+
+    private $returnResponse;
+
+    public function __construct()
+    {
+        $host     = env('STICKY_API_DOMAIN');
+        $username = env('STICKY_API_USERNAME');
+        $password = env('STICKY_API_PASSWORD');
+
+        $apiConfig      = new ApiConfig();
+        $this->host     = $apiConfig->setHost($host);
+        $this->username = $apiConfig->setUsername($username);
+        $this->password = $apiConfig->setPassword($password);
+
+        $this->returnResponse = Config::get('sticky.API_DEFAULT_RESPONSE');
+    }
 
     /** Create new prospect - Sticky.io
      *
@@ -24,39 +49,34 @@ class Prospects
      */
     public function newProspect(array $prospectPayload): JsonResponse
     {
-        $returnResponse = ['error' => true, 'message' => '', 'data' => []];
         try {
             //Api validations
-            $isValid = json_decode(validator($prospectPayload, Config::get('sticky.NEW_PROSPECT_VALIDATION'))->errors(), true);
-
-            if ($isValid) {
-                $returnResponse['data'] = $isValid;
-                throw new InvalidArgumentException(__('sticky.new_prospect_validation_fails'));
-            }
+            $this->payloadValidation($prospectPayload, Config::get('sticky.NEW_PROSPECT_VALIDATION'));
 
             //If validation pass, call new prospect api
-            $stickyHost = env('STICKY_API_DOMAIN');
-            $endPoint   = Config::get('sticky.ENDPOINTS.STICKY.NEW_PROSPECT');
-            $host       = $stickyHost.$endPoint;
-            $request    = $this->getRequest();
-
-            $response = $request->post($host, $prospectPayload)->json();
+            $endPoint = Config::get('sticky.ENDPOINTS.STICKY.NEW_PROSPECT');
+            $method   = Config::get('sticky.METHODS.post');
+            $response = $this->prepareRequest($endPoint, $method, $prospectPayload);
 
             //If Api request decline
             if (Arr::get($response, 'response_code') !== '100' && Arr::get($response, 'error_found') === '1') {
                 throw new InvalidArgumentException(Arr::get($response, 'decline_reason'));
             }
 
-            $returnResponse['error']   = false;
-            $returnResponse['message'] = __('sticky.new_prospect_create_success');
-            $returnResponse['data']    = $response;
+            $this->returnResponse['error']   = false;
+            $this->returnResponse['message'] = __('sticky.new_prospect_create_success');
+            $this->returnResponse['data']    = $response;
 
-            return response()->json($returnResponse);
+            return response()->json($this->returnResponse);
         } catch (Exception $ex) {
             //@ToDo log Exception
-            $returnResponse['message'] = $ex->getMessage();
+            $this->returnResponse['success'] = false;
+            $this->returnResponse['message'] = $ex->getMessage();
+            if (! empty($this->validateResponse)) {
+                $this->returnResponse['data'] = $this->validateResponse;
+            }
 
-            return response()->json($returnResponse);
+            return response()->json($this->returnResponse);
         }
     }
 
@@ -68,40 +88,34 @@ class Prospects
      */
     public function updateProspect(array $prospectPayload): JsonResponse
     {
-        $isValid        = [];
-        $returnResponse = ['error' => true, 'message' => '', 'data' => []];
         try {
             //Api validations
             foreach (Arr::get($prospectPayload, 'prospect_id', []) as $prospectId => $prospects) {
-                $isValid[$prospectId] = json_decode(validator($prospects, Config::get('sticky.UPDATE_PROSPECT_VALIDATION'))->errors(), true);
-
-                if ($isValid[$prospectId]) {
-                    $returnResponse['data'] = $isValid;
-                    throw new InvalidArgumentException(__('sticky.new_prospect_validation_fails'));
-                }
+                $this->payloadValidation($prospects, Config::get('sticky.NEW_PROSPECT_VALIDATION'), $prospectId);
             }
 
             //If validation pass, call update prospect api
-            $stickyHost = env('STICKY_API_DOMAIN');
-            $endPoint   = Config::get('sticky.ENDPOINTS.STICKY.UPDATE_PROSPECT');
-            $host       = $stickyHost.$endPoint;
-            $request    = $this->getRequest();
-
-            $response = $request->post($host, $prospectPayload)->json();
+            $endPoint = Config::get('sticky.ENDPOINTS.STICKY.UPDATE_PROSPECT');
+            $method   = Config::get('sticky.METHODS.post');
+            $response = $this->prepareRequest($endPoint, $method, $prospectPayload);
 
             //Write update_prospect API response (field specific) in a log
             //@ToDo log
 
-            $returnResponse['error']   = false;
-            $returnResponse['message'] = __('sticky.update_prospect_success');
-            $returnResponse['data']    = $response;
+            $this->returnResponse['error']   = false;
+            $this->returnResponse['message'] = __('sticky.update_prospect_success');
+            $this->returnResponse['data']    = $response;
 
-            return response()->json($returnResponse);
+            return response()->json($this->returnResponse);
         } catch (Exception $ex) {
             //@ToDo log Exception
-            $returnResponse['message'] = $ex->getMessage();
+            $this->returnResponse['success'] = false;
+            $this->returnResponse['message'] = $ex->getMessage();
+            if (! empty($this->validateResponse)) {
+                $this->returnResponse['data'] = $this->validateResponse;
+            }
 
-            return response()->json($returnResponse);
+            return response()->json($this->returnResponse);
         }
     }
 }

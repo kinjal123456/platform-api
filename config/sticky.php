@@ -108,6 +108,6 @@ return [
     'NEW_UPSELL_VALIDATION' => [
         'previousOrderId' => 'required',
         'shippingId'      => 'required',
-        'offers'          => 'required',
+        'offers'          => 'required|array',
     ],
 ];
