@@ -13,6 +13,13 @@ use Exception;
  */
 class OrderController extends Controller
 {
+    private $orders;
+
+    public function __construct()
+    {
+        $this->orders = new Orders();
+    }
+
     /** Call sticky new order api
      *
      * @param Request $request
@@ -21,10 +28,7 @@ class OrderController extends Controller
     public function create(Request $request): JsonResponse
     {
         try {
-            $orderPayload = $request->all();
-            $orders       = new Orders();
-
-            return $orders->newOrder($orderPayload);
+            return $this->orders->newOrder($request->all());
         } catch (Exception $ex) {
             return response()->json([$ex->getMessage()]);
         }
@@ -38,10 +42,7 @@ class OrderController extends Controller
     public function update(Request $request): JsonResponse
     {
         try {
-            $orderPayload = $request->all();
-            $orders       = new Orders();
-
-            return $orders->updateOrder($orderPayload);
+            return $this->orders->updateOrder($request->all());
         } catch (Exception $ex) {
             return response()->json([$ex->getMessage()]);
         }
@@ -49,15 +50,13 @@ class OrderController extends Controller
 
     /** Call sticky order view api
      *
+     * @param Request $request
      * @return JsonResponse
      */
     public function view(Request $request): JsonResponse
     {
         try {
-            $orderPayload = $request->all();
-            $orders = new Orders();
-
-            return $orders->viewOrder($orderPayload);
+            return $this->orders->viewOrder($request->all());
         } catch (Exception $ex) {
             return response()->json([$ex->getMessage()]);
         }

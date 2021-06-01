@@ -13,6 +13,13 @@ use Exception;
  */
 class UpsellController extends Controller
 {
+    private $upsells;
+
+    public function __construct()
+    {
+        $this->upsells = new Upsells();
+    }
+
     /** Call sticky new upsell api
      *
      * @param Request $request
@@ -21,10 +28,7 @@ class UpsellController extends Controller
     public function create(Request $request): JsonResponse
     {
         try {
-            $upsellPayload = $request->all();
-            $upsells       = new Upsells();
-
-            return $upsells->newUpsell($upsellPayload);
+            return $this->upsells->newUpsell($request->all());
         } catch (Exception $ex) {
             return response()->json([$ex->getMessage()]);
         }

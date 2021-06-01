@@ -13,6 +13,13 @@ use Exception;
  */
 class ProspectController extends Controller
 {
+    private $prospect;
+
+    public function __construct()
+    {
+        $this->prospect = new Prospects();
+    }
+
     /** Call sticky new prospect api
      *
      * @param Request $request
@@ -21,10 +28,7 @@ class ProspectController extends Controller
     public function create(Request $request): JsonResponse
     {
         try {
-            $stickyPayload = $request->all();
-            $prospect      = new Prospects();
-
-            return $prospect->newProspect($stickyPayload);
+            return $this->prospect->newProspect($request->all());
         } catch (Exception $ex) {
             return response()->json([$ex->getMessage()]);
         }
@@ -38,10 +42,7 @@ class ProspectController extends Controller
     public function update(Request $request): JsonResponse
     {
         try {
-            $stickyPayload = $request->all();
-            $prospect      = new Prospects();
-
-            return $prospect->updateProspect($stickyPayload);
+            return $this->prospect->updateProspect($request->all());
         } catch (Exception $ex) {
             return response()->json([$ex->getMessage()]);
         }

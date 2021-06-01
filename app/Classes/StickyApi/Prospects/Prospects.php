@@ -91,7 +91,7 @@ class Prospects
         try {
             //Api validations
             foreach (Arr::get($prospectPayload, 'prospect_id', []) as $prospectId => $prospects) {
-                $this->payloadValidation($prospects, Config::get('sticky.NEW_PROSPECT_VALIDATION'), $prospectId);
+                $this->payloadValidation($prospects, Config::get('sticky.UPDATE_PROSPECT_VALIDATION'), $prospectId);
             }
 
             //If validation pass, call update prospect api

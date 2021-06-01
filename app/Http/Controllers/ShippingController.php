@@ -12,6 +12,13 @@ use Exception;
  */
 class ShippingController extends Controller
 {
+    private $shipping;
+
+    public function __construct()
+    {
+        $this->shipping = new Shipping();
+    }
+
     /** Call sticky get shipping methods api
      *
      * @return JsonResponse
@@ -19,9 +26,7 @@ class ShippingController extends Controller
     public function get(): JsonResponse
     {
         try {
-            $shipping = new Shipping();
-
-            return $shipping->getShippingMethods();
+            return $this->shipping->getShippingMethods();
         } catch (Exception $ex) {
             return response()->json([$ex->getMessage()]);
         }
