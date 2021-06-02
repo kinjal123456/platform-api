@@ -2,29 +2,42 @@
 
 namespace Tests\Unit;
 
-use Illuminate\Support\Facades\Config;
 use Tests\TestCase;
 
 class OrderTest extends TestCase
 {
     /**
-     * Order crate unit test.
+     * Validate Order view API unit test.
      *
      * @return void
      */
-    public function testOrderView()
+    public function testOrderViewValidateApiRequest()
+    {
+        $data = [
+            "order_id" => [],
+        ];
+
+        $this->json('POST', 'api/order/view', $data, ['Accept' => 'application/json'])
+            ->assertOk()
+            ->assertHeader('Content-Type', 'application/json')
+            ->assertJsonValidationErrors('order_id', 'data.0');
+    }
+
+    /**
+     * Order view API unit test.
+     *
+     * @return void
+     */
+    public function testOrderViewAPI()
     {
         $data = [
             "order_id" => [27157],
-        ];;
+        ];
 
         $this->json('POST', 'api/order/view', $data, ['Accept' => 'application/json'])
-            ->assertStatus(200)
+            ->assertOk()
             ->assertJsonStructure([
-                "error" => false,
-                "success" => true,
-                "message" => Config::get('sticky.view_order_success'),
-                "data" => [],
+                'error', 'success', 'message', 'data'
             ]);
     }
 }
