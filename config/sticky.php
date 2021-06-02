@@ -82,7 +82,7 @@ return [
         'shippingZip'      => 'required',
         'shippingCountry'  => 'required',
         'phone'            => 'required',
-        'email'            => 'required',
+        'email'            => 'required|email',
         'creditCardType'   => 'required',
         'creditCardNumber' => 'required',
         'expirationDate'   => 'required',
@@ -91,7 +91,7 @@ return [
         'tranType'         => 'required',
         'ipAddress'        => 'required',
         'campaignId'       => 'required',
-        'offers'           => 'required',
+        'offers'           => 'required|array',
     ],
 
     'UPDATE_ORDER_VALIDATION' => [
