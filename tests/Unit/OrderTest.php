@@ -96,11 +96,65 @@ class OrderTest extends TestCase
         ];
 
         $this->json('POST', 'api/order/create', $data, ['Accept' => 'application/json'])->assertOk()->assertJsonStructure([
-                'error',
-                'success',
-                'message',
-                'data',
-            ]);
+            'error',
+            'success',
+            'message',
+            'data',
+        ]);
+    }
+
+    /**
+     * Validate Update Order API unit test.
+     *
+     * @return void
+     */
+    public function testUpdateOrderValidateApiRequest()
+    {
+        $data = [
+            "order_id" => [
+                "27157" => [
+                    "notes"      => "",
+                    "email"      => "",
+                    "first_name" => "",
+                    "last_name"  => "",
+                ],
+            ],
+        ];
+
+        $validateFields = [
+            "notes",
+            "email",
+            "first_name",
+            "last_name",
+        ];
+
+        $this->json('POST', 'api/order/update', $data, ['Accept' => 'application/json'])->assertOk()->assertHeader('Content-Type', 'application/json')->assertJsonValidationErrors($validateFields, 'data.27157');
+    }
+
+    /**
+     * Update Order API unit test.
+     *
+     * @return void
+     */
+    public function testUpdateOrderApi()
+    {
+        $data = [
+            "order_id" => [
+                "27157" => [
+                    "notes"      => "Adding a new note to this order via order_update method",
+                    "email"      => "updated@email.com",
+                    "first_name" => "FirstName1",
+                    "last_name"  => "LastName1",
+                ],
+            ],
+        ];
+
+        $this->json('POST', 'api/order/update', $data, ['Accept' => 'application/json'])->assertOk()->assertJsonStructure([
+            'error',
+            'success',
+            'message',
+            'data',
+        ]);
     }
 
     /**
