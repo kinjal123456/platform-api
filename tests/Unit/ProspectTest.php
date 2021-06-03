@@ -85,6 +85,10 @@ class ProspectTest extends TestCase
             'success',
             'message',
             'data',
+        ])->assertJson([
+            'error'   => false,
+            'success' => true,
+            'message' => __('sticky.new_prospect_create_success'),
         ]);
     }
 
@@ -156,6 +160,10 @@ class ProspectTest extends TestCase
             'success',
             'message',
             'data',
+        ])->assertJson([
+            'error'   => false,
+            'success' => true,
+            'message' => __('sticky.update_prospect_success'),
         ]);
     }
 }

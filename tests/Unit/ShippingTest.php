@@ -18,6 +18,10 @@ class ShippingTest extends TestCase
             'success',
             'message',
             'data',
+        ])->assertJson([
+            'error'   => false,
+            'success' => true,
+            'message' => __('sticky.get_shipping_methods_success'),
         ]);
     }
 }

@@ -67,25 +67,25 @@ class OrderTest extends TestCase
     public function testNewOrderApi()
     {
         $data = [
-            "firstName"        => "Test",
-            "lastName"         => "Donotship",
-            "shippingAddress1" => "123 Medellin St, test",
-            "shippingAddress2" => "APT 7, test",
-            "shippingCity"     => "Santo Alto",
-            "shippingState"    => "TX",
-            "shippingZip"      => "33544",
-            "shippingCountry"  => "US",
-            "phone"            => "8135551212",
-            "email"            => "postman@apitest.com",
-            "creditCardType"   => "VISA",
-            "creditCardNumber" => "1444444444444440",
-            "expirationDate"   => "0628",
-            "CVV"              => "123",
-            "shippingId"       => "6",
-            "tranType"         => "Sale",
-            "ipAddress"        => "127.0.0.1",
-            "campaignId"       => "1",
-            "offers"           => [
+            "firstName"             => "Test",
+            "lastName"              => "Donotship",
+            "shippingAddress1"      => "123 Medellin St, test",
+            "shippingAddress2"      => "APT 7, test",
+            "shippingCity"          => "Santo Alto",
+            "shippingState"         => "TX",
+            "shippingZip"           => "33544",
+            "shippingCountry"       => "US",
+            "phone"                 => "8135551212",
+            "email"                 => "postman@apitest.com",
+            "creditCardType"        => "VISA",
+            "creditCardNumber"      => "1444444444444440",
+            "expirationDate"        => "0628",
+            "CVV"                   => "123",
+            "shippingId"            => "6",
+            "tranType"              => "Sale",
+            "ipAddress"             => "127.0.0.1",
+            "campaignId"            => "1",
+            "offers"                => [
                 [
                     "offer_id"         => "8",
                     "product_id"       => "4",
@@ -93,6 +93,7 @@ class OrderTest extends TestCase
                     "quantity"         => "1",
                 ],
             ],
+            "billingSameAsShipping" => "Yes",
         ];
 
         $this->json('POST', 'api/order/create', $data, ['Accept' => 'application/json'])->assertOk()->assertJsonStructure([
@@ -100,6 +101,10 @@ class OrderTest extends TestCase
             'success',
             'message',
             'data',
+        ])->assertJson([
+            'error'   => false,
+            'success' => true,
+            'message' => __('sticky.new_order_create_success'),
         ]);
     }
 
@@ -154,6 +159,10 @@ class OrderTest extends TestCase
             'success',
             'message',
             'data',
+        ])->assertJson([
+            'error'   => false,
+            'success' => true,
+            'message' => __('sticky.update_order_success'),
         ]);
     }
 
@@ -187,6 +196,10 @@ class OrderTest extends TestCase
             'success',
             'message',
             'data',
+        ])->assertJson([
+            'error'   => false,
+            'success' => true,
+            'message' => __('sticky.view_order_success'),
         ]);
     }
 }
