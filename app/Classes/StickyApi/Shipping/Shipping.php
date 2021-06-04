@@ -55,7 +55,7 @@ class Shipping
 
             //If Api request decline
             if (Arr::get($response, 'status') !== 'SUCCESS') {
-                throw new InvalidArgumentException(__('sticky.get_shipping_methods_fails'));
+                throw new InvalidArgumentException(Arr::get($response, 'message'));
             }
 
             $this->returnResponse['error']   = false;
@@ -65,8 +65,8 @@ class Shipping
             return response()->json($this->returnResponse);
         } catch (Exception $ex) {
             //@ToDo log Exception
-            $this->returnResponse['success'] = false;
-            $this->returnResponse['message'] = $ex->getMessage();
+            $this->returnResponse['success']  = false;
+            $this->returnResponse['apiError'] = $ex->getMessage();
 
             return response()->json($this->returnResponse);
         }

@@ -71,9 +71,11 @@ class Prospects
         } catch (Exception $ex) {
             //@ToDo log Exception
             $this->returnResponse['success'] = false;
-            $this->returnResponse['message'] = $ex->getMessage();
-            if (! empty($this->validateResponse)) {
-                $this->returnResponse['data'] = $this->validateResponse;
+            if (! empty($this->validateResponse[0])) {
+                $this->returnResponse['message'] = $ex->getMessage();
+                $this->returnResponse['data']    = $this->validateResponse;
+            } else {
+                $this->returnResponse['apiError'] = $ex->getMessage();
             }
 
             return response()->json($this->returnResponse);

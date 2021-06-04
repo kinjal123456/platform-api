@@ -28,10 +28,11 @@ return [
     ],
 
     'API_DEFAULT_RESPONSE' => [
-        'error'   => true,
-        'success' => true,
-        'message' => '',
-        'data'    => [],
+        'error'    => true,
+        'success'  => true,
+        'message'  => '',
+        'apiError' => '',
+        'data'     => [],
     ],
 
     'NEW_PROSPECT_VALIDATION' => [
