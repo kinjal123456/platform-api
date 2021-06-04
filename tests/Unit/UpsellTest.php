@@ -16,21 +16,44 @@ class UpsellTest extends TestCase
     }
 
     /**
-     * New Upsell API unit test.
+     * New Upsell API unit test (with valid data).
      *
      * @return void
      */
-    public function testNewUpsellApi()
+    public function testNewUpsellApiWithValidData()
     {
-        $this->json('POST', 'api/upsell/create', $this->faker->prepareNewUpsellData(), ['Accept' => 'application/json'])->assertOk()->assertJsonStructure([
+        $this->json('POST', 'api/upsell/create', $this->faker->prepareNewUpsellValidData(), ['Accept' => 'application/json'])->assertOk()->assertHeader('Content-Type', 'application/json')->assertJsonStructure([
             'error',
             'success',
             'message',
+            'apiError',
             'data',
         ])->assertJson([
             'error'   => false,
             'success' => true,
             'message' => __('sticky.new_upsell_create_success'),
+            'apiError' => '',
+        ]);
+    }
+
+    /**
+     * New Upsell API unit test (with invalid data).
+     *
+     * @return void
+     */
+    public function testNewUpsellApiWithInvalidData()
+    {
+        $this->json('POST', 'api/upsell/create', $this->faker->prepareNewUpsellInvalidData(), ['Accept' => 'application/json'])->assertOk()->assertHeader('Content-Type', 'application/json')->assertJsonStructure([
+            'error',
+            'success',
+            'message',
+            'apiError',
+            'data',
+        ])->assertJson([
+            'error'   => true,
+            'success' => false,
+            'message' => '',
+            'apiError' => 'Could not find original order Id',
         ]);
     }
 }

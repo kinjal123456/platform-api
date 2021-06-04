@@ -16,6 +16,7 @@ trait ValidationTraits
      * @param array $payload
      * @param array $rules
      * @param int $key - this will use for multiple item update
+     * @throws \Exception
      */
     private function payloadValidation(array $payload, array $rules, int $key = 0): void
     {

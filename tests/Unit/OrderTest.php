@@ -2,6 +2,7 @@
 
 namespace Tests\Unit;
 
+use Illuminate\Support\Arr;
 use Tests\TestCase;
 use Tests\TestDataFaker;
 
@@ -16,59 +17,131 @@ class OrderTest extends TestCase
     }
 
     /**
-     * New Order API unit test.
+     * New Order API unit test (with valid data).
      *
      * @return void
      */
-    public function testNewOrderApi()
+    public function testNewOrderApiWithValidData()
     {
-        $this->json('POST', 'api/order/create', $this->faker->prepareNewOrderData(), ['Accept' => 'application/json'])->assertOk()->assertJsonStructure([
+        $this->json('POST', 'api/order/create', $this->faker->prepareNewOrderValidData(), ['Accept' => 'application/json'])->assertOk()->assertHeader('Content-Type', 'application/json')->assertJsonStructure([
+                'error',
+                'success',
+                'message',
+                'apiError',
+                'data',
+            ])->assertJson([
+                'error'    => false,
+                'success'  => true,
+                'message'  => __('sticky.new_order_create_success'),
+                'apiError' => '',
+            ]);
+    }
+
+    /**
+     * New Order API unit test (with invalid data).
+     *
+     * @return void
+     */
+    public function testNewOrderApiWithInvalidData()
+    {
+        $this->json('POST', 'api/order/create', $this->faker->prepareNewOrderInvalidData(), ['Accept' => 'application/json'])->assertOk()->assertHeader('Content-Type', 'application/json')->assertJsonStructure([
             'error',
             'success',
             'message',
+            'apiError',
             'data',
         ])->assertJson([
-            'error'   => false,
-            'success' => true,
-            'message' => __('sticky.new_order_create_success'),
+            'error'    => true,
+            'success'  => false,
+            'message'  => '',
+            'apiError' => 'Shipping state must be 2 characters and valid US state',
         ]);
     }
 
     /**
-     * Update Order API unit test.
+     * Update Order API unit test (with valid data).
      *
      * @return void
      */
-    public function testUpdateOrderApi()
+    public function testUpdateOrderApiWithValidData()
     {
-        $this->json('POST', 'api/order/update', $this->faker->prepareUpdateOrderData(), ['Accept' => 'application/json'])->assertOk()->assertJsonStructure([
+        $this->json('POST', 'api/order/update', $this->faker->prepareUpdateOrderValidData(), ['Accept' => 'application/json'])->assertOk()->assertHeader('Content-Type', 'application/json')->assertJsonStructure([
             'error',
             'success',
             'message',
+            'apiError',
             'data',
         ])->assertJson([
             'error'   => false,
             'success' => true,
             'message' => __('sticky.update_order_success'),
+            'apiError' => '',
         ]);
     }
 
     /**
-     * View Order API unit test.
+     * Update Order API unit test (with invalid data).
      *
      * @return void
      */
-    public function testViewOrderAPI()
+    public function testUpdateOrderApiWithInvalidData()
     {
-        $this->json('POST', 'api/order/view', $this->faker->prepareViewOrderData(), ['Accept' => 'application/json'])->assertOk()->assertJsonStructure([
+        $this->json('POST', 'api/order/update', $this->faker->prepareUpdateOrderInvalidData(), ['Accept' => 'application/json'])->assertOk()->assertHeader('Content-Type', 'application/json')->assertJsonStructure([
             'error',
             'success',
             'message',
+            'apiError',
             'data',
         ])->assertJson([
-            'error'   => false,
-            'success' => true,
-            'message' => __('sticky.view_order_success'),
+            'error'    => false,
+            'success'  => true,
+            'message'  => __('sticky.update_order_success'),
+            'apiError' => '',
+            'data' => [
+                'response_code' => '911'
+            ]
+        ]);
+    }
+
+    /**
+     * View Order API unit test (with valid data).
+     *
+     * @return void
+     */
+    public function testViewOrderAPIWithValidData()
+    {
+        $this->json('POST', 'api/order/view', $this->faker->prepareViewOrderValidData(), ['Accept' => 'application/json'])->assertOk()->assertHeader('Content-Type', 'application/json')->assertJsonStructure([
+            'error',
+            'success',
+            'message',
+            'apiError',
+            'data',
+        ])->assertJson([
+            'error'    => false,
+            'success'  => true,
+            'message'  => __('sticky.view_order_success'),
+            'apiError' => '',
+        ]);
+    }
+
+    /**
+     * View Order API unit test (with invalid data).
+     *
+     * @return void
+     */
+    public function testViewOrderAPIWithInvalidData()
+    {
+        $this->json('POST', 'api/order/view', $this->faker->prepareViewOrderInvalidData(), ['Accept' => 'application/json'])->assertOk()->assertHeader('Content-Type', 'application/json')->assertJsonStructure([
+            'error',
+            'success',
+            'message',
+            'apiError',
+            'data',
+        ])->assertJson([
+            'error'    => true,
+            'success'  => false,
+            'message'  => sprintf(__('sticky.view_order_fails'), implode(',', Arr::get($this->faker->prepareViewOrderInvalidData(), 'order_id'))),
+            'apiError' => '',
         ]);
     }
 }

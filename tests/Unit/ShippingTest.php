@@ -13,10 +13,11 @@ class ShippingTest extends TestCase
      */
     public function testGetShippingMethodsApi()
     {
-        $this->json('GET', 'api/shipping/get', ['Accept' => 'application/json'])->assertOk()->assertJsonStructure([
+        $this->json('GET', 'api/shipping/get', ['Accept' => 'application/json'])->assertOk()->assertHeader('Content-Type', 'application/json')->assertJsonStructure([
             'error',
             'success',
             'message',
+            'apiError',
             'data',
         ])->assertJson([
             'error'   => false,
