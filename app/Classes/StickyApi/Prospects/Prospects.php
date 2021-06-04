@@ -6,7 +6,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Config;
 use Exception;
-use InvalidArgumentException;
 use App\Classes\StickyTraits\StickyTraits;
 use App\Classes\StickyTraits\ValidationTraits;
 use App\Classes\StickyApi\ApiConfig;
@@ -60,7 +59,7 @@ class Prospects
 
             //If Api request decline
             if (Arr::get($response, 'response_code') !== '100' && Arr::get($response, 'error_found') === '1') {
-                throw new InvalidArgumentException(Arr::get($response, 'decline_reason'));
+                throw new Exception(Arr::get($response, 'decline_reason'));
             }
 
             $this->returnResponse['error']   = false;

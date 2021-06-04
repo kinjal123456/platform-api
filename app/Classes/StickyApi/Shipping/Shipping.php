@@ -4,7 +4,6 @@ namespace App\Classes\StickyApi\Shipping;
 
 use Illuminate\Http\JsonResponse;
 use Exception;
-use InvalidArgumentException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Config;
 use App\Classes\StickyTraits\StickyTraits;
@@ -55,7 +54,7 @@ class Shipping
 
             //If Api request decline
             if (Arr::get($response, 'status') !== 'SUCCESS') {
-                throw new InvalidArgumentException(Arr::get($response, 'message'));
+                throw new Exception(Arr::get($response, 'message'));
             }
 
             $this->returnResponse['error']   = false;

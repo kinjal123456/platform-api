@@ -2,7 +2,7 @@
 
 namespace App\Classes\StickyTraits;
 
-use InvalidArgumentException;
+use Exception;
 
 /**
  * Trait ValidationTraits
@@ -22,7 +22,7 @@ trait ValidationTraits
         $this->validateResponse[$key] = json_decode(validator($payload, $rules)->errors(), true);
 
         if ($this->validateResponse[$key]) {
-            throw new InvalidArgumentException(__('sticky.invalid_payload'));
+            throw new Exception(__('sticky.invalid_payload'));
         }
     }
 }

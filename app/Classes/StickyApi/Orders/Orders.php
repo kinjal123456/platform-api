@@ -6,7 +6,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Config;
 use Exception;
-use InvalidArgumentException;
 use App\Classes\StickyTraits\StickyTraits;
 use App\Classes\StickyTraits\ValidationTraits;
 use App\Classes\StickyApi\ApiConfig;
@@ -75,7 +74,7 @@ class Orders
 
             //If Api request decline
             if (Arr::get($response, 'response_code') !== Config::get('sticky.RESPONSE_CODES.STICKY.0') && Arr::get($response, 'error_found') === '1') {
-                throw new InvalidArgumentException(Arr::get($response, 'error_message'));
+                throw new Exception(Arr::get($response, 'error_message'));
             }
 
             $this->returnResponse['error']   = false;
@@ -155,7 +154,7 @@ class Orders
 
             //If Api request decline
             if (Arr::get($response, 'response_code') !== Config::get('sticky.RESPONSE_CODES.STICKY.0')) {
-                throw new InvalidArgumentException(sprintf(__('sticky.view_order_fails'), implode(',', Arr::get($orderPayload, 'order_id'))));
+                throw new Exception(sprintf(__('sticky.view_order_fails'), implode(',', Arr::get($orderPayload, 'order_id'))));
             }
 
             $this->returnResponse['error']   = false;
